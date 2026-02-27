@@ -139,7 +139,7 @@ pub struct JsDifficultyAttributes {
     pub n_hold_notes: Option<u32>,
     /// The approach rate.
     ///
-    /// Only available for osu! and osu!catch.
+    /// Only available for osu!.
     #[wasm_bindgen(readonly)]
     pub ar: Option<f64>,
     /// The perceived hit window for an n300 inclusive of rate-adjusting mods
@@ -169,6 +169,26 @@ pub struct JsDifficultyAttributes {
     /// Return the maximum combo.
     #[wasm_bindgen(js_name = "maxCombo", readonly)]
     pub max_combo: u32,
+
+    /// GOAT-chan: fix compilation
+    /// i don't know what the fuck am i doing
+    /// i don't know rust!!!!
+    #[wasm_bindgen(js_name = "aimTopWeightedSliderFactor", readonly)]
+    pub aim_top_weighted_slider_factor: Option<f64>,
+    #[wasm_bindgen(js_name = "speedTopWeightedSliderFactor", readonly)]
+    pub speed_top_weighted_slider_factor: Option<f64>,
+    #[wasm_bindgen(js_name = "nestedScorePerObject", readonly)]
+    pub nested_score_per_object: Option<f64>,
+    #[wasm_bindgen(js_name = "legacyScoreBaseMultiplier", readonly)]
+    pub legacy_score_base_multiplier: Option<f64>,
+    #[wasm_bindgen(js_name = "maximumLegacyComboScore", readonly)]
+    pub maximum_legacy_combo_score: Option<f64>,
+    #[wasm_bindgen(js_name = "mechanicalDifficulty", readonly)]
+    pub mechanical_difficulty: Option<f64>,
+    #[wasm_bindgen(js_name = "consistencyFactor", readonly)]
+    pub consistency_factor: Option<f64>,
+    #[wasm_bindgen(readonly)]
+    pub preempt: Option<f64>,
 }
 
 impl From<OsuDifficultyAttributes> for JsDifficultyAttributes {
@@ -179,9 +199,14 @@ impl From<OsuDifficultyAttributes> for JsDifficultyAttributes {
             speed,
             flashlight,
             slider_factor,
+            aim_top_weighted_slider_factor,
+            speed_top_weighted_slider_factor,
             speed_note_count,
             aim_difficult_strain_count,
             speed_difficult_strain_count,
+            nested_score_per_object,
+            legacy_score_base_multiplier,
+            maximum_legacy_combo_score,
             ar,
             great_hit_window,
             ok_hit_window,
@@ -204,6 +229,11 @@ impl From<OsuDifficultyAttributes> for JsDifficultyAttributes {
             speed: Some(speed),
             flashlight: Some(flashlight),
             slider_factor: Some(slider_factor),
+            aim_top_weighted_slider_factor: Some(aim_top_weighted_slider_factor),
+            speed_top_weighted_slider_factor: Some(speed_top_weighted_slider_factor),
+            nested_score_per_object: Some(nested_score_per_object),
+            legacy_score_base_multiplier: Some(legacy_score_base_multiplier),
+            maximum_legacy_combo_score: Some(maximum_legacy_combo_score),
             speed_note_count: Some(speed_note_count),
             aim_difficult_strain_count: Some(aim_difficult_strain_count),
             speed_difficult_strain_count: Some(speed_difficult_strain_count),
@@ -232,6 +262,8 @@ impl From<TaikoDifficultyAttributes> for JsDifficultyAttributes {
             great_hit_window,
             ok_hit_window,
             mono_stamina_factor,
+            mechanical_difficulty,
+            consistency_factor,
             stars,
             max_combo,
             is_convert,
@@ -248,6 +280,8 @@ impl From<TaikoDifficultyAttributes> for JsDifficultyAttributes {
             great_hit_window: Some(great_hit_window),
             ok_hit_window: Some(ok_hit_window),
             mono_stamina_factor: Some(mono_stamina_factor),
+            mechanical_difficulty: Some(mechanical_difficulty),
+            consistency_factor: Some(consistency_factor),
             max_combo,
             ..Self::default()
         }
@@ -260,7 +294,7 @@ impl From<CatchDifficultyAttributes> for JsDifficultyAttributes {
 
         let CatchDifficultyAttributes {
             stars,
-            ar,
+            preempt,
             n_fruits,
             n_droplets,
             n_tiny_droplets,
@@ -271,7 +305,7 @@ impl From<CatchDifficultyAttributes> for JsDifficultyAttributes {
             mode: JsGameMode::Catch,
             stars,
             is_convert,
-            ar: Some(ar),
+            preempt: Some(preempt),
             n_fruits: Some(n_fruits),
             n_droplets: Some(n_droplets),
             n_tiny_droplets: Some(n_tiny_droplets),
@@ -350,6 +384,14 @@ impl TryFrom<JsDifficultyAttributes> for DifficultyAttributes {
             meh_hit_window,
             mono_stamina_factor,
             max_combo,
+            aim_top_weighted_slider_factor,
+            speed_top_weighted_slider_factor,
+            nested_score_per_object,
+            legacy_score_base_multiplier,
+            maximum_legacy_combo_score,
+            mechanical_difficulty,
+            consistency_factor,
+            preempt,
         } = attrs;
 
         match mode {
@@ -372,6 +414,11 @@ impl TryFrom<JsDifficultyAttributes> for DifficultyAttributes {
                     Some(n_sliders),
                     Some(n_large_ticks),
                     Some(n_spinners),
+                    Some(aim_top_weighted_slider_factor),
+                    Some(speed_top_weighted_slider_factor),
+                    Some(nested_score_per_object),
+                    Some(legacy_score_base_multiplier),
+                    Some(maximum_legacy_combo_score),
                 ) = (
                     aim,
                     aim_difficult_slider_count,
@@ -390,6 +437,11 @@ impl TryFrom<JsDifficultyAttributes> for DifficultyAttributes {
                     n_sliders,
                     n_large_ticks,
                     n_spinners,
+                    aim_top_weighted_slider_factor,
+                    speed_top_weighted_slider_factor,
+                    nested_score_per_object,
+                    legacy_score_base_multiplier,
+                    maximum_legacy_combo_score
                 ) {
                     return Ok(Self::Osu(OsuDifficultyAttributes {
                         aim,
@@ -397,9 +449,14 @@ impl TryFrom<JsDifficultyAttributes> for DifficultyAttributes {
                         speed,
                         flashlight,
                         slider_factor,
+                        aim_top_weighted_slider_factor,
+                        speed_top_weighted_slider_factor,
                         speed_note_count,
                         aim_difficult_strain_count,
                         speed_difficult_strain_count,
+                        nested_score_per_object,
+                        legacy_score_base_multiplier,
+                        maximum_legacy_combo_score,
                         ar,
                         great_hit_window,
                         ok_hit_window,
@@ -423,6 +480,8 @@ impl TryFrom<JsDifficultyAttributes> for DifficultyAttributes {
                     Some(great_hit_window),
                     Some(ok_hit_window),
                     Some(mono_stamina_factor),
+                    Some(mechanical_difficulty),
+                    Some(consistency_factor)
                 ) = (
                     stamina,
                     reading,
@@ -431,6 +490,8 @@ impl TryFrom<JsDifficultyAttributes> for DifficultyAttributes {
                     great_hit_window,
                     ok_hit_window,
                     mono_stamina_factor,
+                    mechanical_difficulty,
+                    consistency_factor
                 ) {
                     return Ok(Self::Taiko(TaikoDifficultyAttributes {
                         stamina,
@@ -440,6 +501,8 @@ impl TryFrom<JsDifficultyAttributes> for DifficultyAttributes {
                         great_hit_window,
                         ok_hit_window,
                         mono_stamina_factor,
+                        mechanical_difficulty,
+                        consistency_factor,
                         stars,
                         max_combo,
                         is_convert,
@@ -447,12 +510,12 @@ impl TryFrom<JsDifficultyAttributes> for DifficultyAttributes {
                 }
             }
             JsGameMode::Catch => {
-                if let (Some(ar), Some(n_fruits), Some(n_droplets), Some(n_tiny_droplets)) =
-                    (ar, n_fruits, n_droplets, n_tiny_droplets)
+                if let (Some(preempt), Some(n_fruits), Some(n_droplets), Some(n_tiny_droplets)) =
+                    (preempt, n_fruits, n_droplets, n_tiny_droplets)
                 {
                     return Ok(Self::Catch(CatchDifficultyAttributes {
                         stars,
-                        ar,
+                        preempt,
                         n_fruits,
                         n_droplets,
                         n_tiny_droplets,
