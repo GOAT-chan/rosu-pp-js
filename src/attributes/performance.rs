@@ -69,6 +69,15 @@ pub struct JsPerformanceAttributes {
     /// Only available for osu!taiko and osu!mania.
     #[wasm_bindgen(js_name = "ppDifficulty", readonly)]
     pub pp_difficulty: Option<f64>,
+
+    #[wasm_bindgen(js_name = "comboBasedEstimatedMissCount", readonly)]
+    pub combo_based_estimated_miss_count: Option<f64>,
+    #[wasm_bindgen(js_name = "scoreBasedEstimatedMissCount", readonly)]
+    pub score_based_estimated_miss_count: Option<f64>,
+    #[wasm_bindgen(js_name = "aimEstimatedSliderBreaks", readonly)]
+    pub aim_estimated_slider_breaks: Option<f64>,
+    #[wasm_bindgen(js_name = "speedEstimatedSliderBreaks", readonly)]
+    pub speed_estimated_slider_breaks: Option<f64>,
 }
 
 impl JsPerformanceAttributes {
@@ -133,6 +142,10 @@ impl From<PerformanceAttributes> for JsPerformanceAttributes {
                 pp_speed,
                 effective_miss_count,
                 speed_deviation,
+                combo_based_estimated_miss_count,
+                score_based_estimated_miss_count,
+                aim_estimated_slider_breaks,
+                speed_estimated_slider_breaks
             }) => Self {
                 difficulty: difficulty.into(),
                 pp,
@@ -142,6 +155,10 @@ impl From<PerformanceAttributes> for JsPerformanceAttributes {
                 pp_speed: Some(pp_speed),
                 effective_miss_count: Some(effective_miss_count),
                 speed_deviation,
+                combo_based_estimated_miss_count: Some(combo_based_estimated_miss_count),
+                score_based_estimated_miss_count,
+                aim_estimated_slider_breaks: Some(aim_estimated_slider_breaks),
+                speed_estimated_slider_breaks: Some(speed_estimated_slider_breaks),
                 ..Self::default()
             },
             PerformanceAttributes::Taiko(TaikoPerformanceAttributes {
@@ -149,14 +166,12 @@ impl From<PerformanceAttributes> for JsPerformanceAttributes {
                 pp,
                 pp_acc,
                 pp_difficulty,
-                effective_miss_count,
                 estimated_unstable_rate,
             }) => Self {
                 difficulty: difficulty.into(),
                 pp,
                 pp_acc: Some(pp_acc),
                 pp_difficulty: Some(pp_difficulty),
-                effective_miss_count: Some(effective_miss_count),
                 estimated_unstable_rate,
                 ..Self::default()
             },
